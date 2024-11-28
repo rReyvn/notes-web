@@ -62,7 +62,7 @@
 
                         <!-- Note delete button -->
                         <div x-show="showDelete" x-transition>
-                            <button wire:click="delete({{ $note->id }})">
+                            <button wire:click.prevent="delete({{ $note->id }})">
                                 <x-svg.x-circle class="size-4 text-red-500 hover:text-red-400 active:text-red-600" />
                             </button>
                         </div>
@@ -74,7 +74,7 @@
                         @endisset
 
                         @isset($note->content)
-                            <div class="text-sm opacity-75">
+                            <div class="{{ isset($note->title) ? 'text-sm opacity-75' : 'font-bold text-xl' }}">
                                 {{ $note->content }}
                             </div>
                         @endisset
@@ -83,4 +83,8 @@
             @endforeach
         </div>
     </div>
+
+    <x-alert />
+
+    {{ $notes->links() }}
 </div>

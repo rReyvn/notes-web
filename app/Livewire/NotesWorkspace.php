@@ -5,17 +5,30 @@ namespace App\Livewire;
 use App\Models\Note;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\Features\SupportPagination\WithoutUrlPagination;
+use Livewire\WithPagination;
 
 class NotesWorkspace extends Component
 {
+    use WithoutUrlPagination, WithPagination;
+
     public $title;
 
     public $content;
 
     public $searchNote;
 
+    public function updatingSearchNote()
+    {
+        $this->resetPage();
+    }
+
     public function save()
     {
+        if ($this->title == '' && $this->content == '') {
+            return;
+        }
+
         $note = new Note;
 
         $note->create([
@@ -24,6 +37,11 @@ class NotesWorkspace extends Component
         ]);
 
         $this->reset(['title', 'content']);
+
+        Session()->flash('success', [
+            'title' => 'Create Note',
+            'message' => 'Note saved successfully!',
+        ]);
     }
 
     public function delete($note_id)
@@ -31,6 +49,11 @@ class NotesWorkspace extends Component
         $note = Note::find($note_id);
 
         $note->delete();
+
+        Session()->flash('success', [
+            'title' => 'Delete Note',
+            'message' => 'Note deleted successfully!',
+        ]);
     }
 
     // Render from layout app
@@ -42,7 +65,7 @@ class NotesWorkspace extends Component
             'notes' => Note::where('title', 'like', '%'.$this->searchNote.'%')
                 ->orWhere('content', 'like', '%'.$this->searchNote.'%')
                 ->latest()
-                ->get(),
+                ->simplePaginate(9),
         ]);
     }
 }
