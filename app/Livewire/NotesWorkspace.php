@@ -8,15 +8,22 @@ use Livewire\Component;
 
 class NotesWorkspace extends Component
 {
+    public $title;
+
     public $content;
+
+    public $searchNote;
 
     public function save()
     {
         $note = new Note;
 
-        $note->content = $this->content;
+        $note->create([
+            'title' => $this->title,
+            'content' => $this->content,
+        ]);
 
-        $note->save();
+        $this->reset('content');
     }
 
     public function delete($note_id)
@@ -26,11 +33,16 @@ class NotesWorkspace extends Component
         $note->delete();
     }
 
+    // Render from layout app
     #[Layout('layouts.app')]
     public function render()
     {
         return view('livewire.notes-workspace', [
-            'notes' => Note::all(),
+            // Get notes data with title or content as parameter
+            'notes' => Note::where('title', 'like', '%'.$this->searchNote.'%')
+                ->orWhere('content', 'like', '%'.$this->searchNote.'%')
+                ->latest()
+                ->get(),
         ]);
     }
 }

@@ -1,19 +1,41 @@
 <div class="space-y-4">
-    <!-- Search Note -->
-    <div class="max-w-xs">
-        <x-search placeholder="Search..." />
+    <div class="flex justify-between items-center">
+        <!-- Search Note -->
+        <div wire:model.live="searchNote" class="w-80">
+            <x-search placeholder="Search..." />
+        </div>
+
+        <!-- User profile -->
+        <div>
+            <div class="flex items-center gap-x-4">
+                <!-- WARNING: Need a authenticated user to display username -->
+                {{ __('Note User') }}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-8">
+                    <path fill-rule="evenodd"
+                        d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-5-2a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM8 9c-1.825 0-3.422.977-4.295 2.437A5.49 5.49 0 0 0 8 13.5a5.49 5.49 0 0 0 4.294-2.063A4.997 4.997 0 0 0 8 9Z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+        </div>
     </div>
 
     <!-- Take Note Input -->
-    <div
-        class="max-w-lg mx-auto p-2 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 shadow rounded-lg">
-        <form wire:submit.blur="save">
-            <div>
-                <input type="text" wire:model.blur="content" id="take_note" placeholder="Take a note..."
+    <div class="max-w-lg mx-auto p-2 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 shadow rounded-lg"
+        x-data="{ showTitleInput: false }" x-on:click.outside="showTitleInput = false">
+        <form wire:submit.prevent="save">
+            <div x-show="showTitleInput" x-transition>
+                <input type="text" wire:model.blur="title" wire:blur="save" id="take_note_title" placeholder="Title"
                     class="w-full border-none sm:text-sm dark:bg-neutral-800 dark:text-white focus:ring-transparent" />
             </div>
 
-            <div wire:dirty>
+            <div>
+                <input type="text" wire:model.blur="content" wire:blur="save" id="take_note_content"
+                    x-on:focus="showTitleInput = true"
+                    x-bind:placeholder="showTitleInput ? 'Content' : 'Take a note...'"
+                    class="w-full border-none sm:text-sm dark:bg-neutral-800 dark:text-white focus:ring-transparent" />
+            </div>
+
+            <div wire:dirty wire:target="content">
                 <div class="flex items-center justify-end px-2 text-xs opacity-50 gap-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-3">
                         <path fill-rule="evenodd"
@@ -25,7 +47,7 @@
                 </div>
             </div>
 
-            <span wire:loading>
+            <span wire:loading wire:target="save">
                 {{ __('...') }}
             </span>
         </form>
@@ -41,9 +63,11 @@
                         <div>{{ $note->title }}</div>
                     @endisset
                     <div class="flex justify-between items-center">
-                        <div>
-                            {{ $note->content }}
-                        </div>
+                        @isset($note->content)
+                            <div>
+                                {{ $note->content }}
+                            </div>
+                        @endisset
 
                         <div x-show="showDelete" x-transition>
                             <button wire:click="delete({{ $note->id }})">
