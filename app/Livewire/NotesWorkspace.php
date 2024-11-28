@@ -23,7 +23,7 @@ class NotesWorkspace extends Component
             'content' => $this->content,
         ]);
 
-        $this->reset('content');
+        $this->reset(['title', 'content']);
     }
 
     public function delete($note_id)
