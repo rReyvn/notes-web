@@ -14,5 +14,8 @@
         "build": "vite build",
         "dev": "vite"
     },
-    "type": "module"
+    "type": "module",
+    "dependencies": {
+        "shiki": "^1.24.0"
+    }
 }

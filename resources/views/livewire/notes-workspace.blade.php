@@ -7,7 +7,7 @@
 
         <!-- User profile -->
         <div>
-            <div class="flex items-center gap-x-4">
+            <div class="flex items-center gap-x-4 opacity-50">
                 <!-- WARNING: Need a authenticated user to display username -->
                 {{ __('Note User') }}
                 <x-svg.user class="size-8" />
@@ -19,7 +19,7 @@
         <!-- Take Note Input -->
         <div class="max-w-lg mx-auto p-2 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 shadow rounded-lg"
             x-data="{ showTitleInput: false }" x-on:click.outside="showTitleInput = false" wire:click.outside="save">
-            <form wire:submit.prevent="save">
+            <form wire:submit="save">
                 <div x-show="showTitleInput" x-transition>
                     <input type="text" wire:model.blur="title" id="take_note_title" placeholder="Title"
                         class="w-full border-none sm:text-sm dark:bg-neutral-800 dark:text-white focus:ring-transparent" />
@@ -32,7 +32,7 @@
                         class="w-full border-none sm:text-sm dark:bg-neutral-800 dark:text-white focus:ring-transparent" />
                 </div>
 
-                <div wire:dirty wire:target="content">
+                <div wire:dirty wire:target="title, content">
                     <div class="flex items-center justify-end px-2 text-xs opacity-50 gap-x-2">
                         <x-svg.info class="size-3" />
 
@@ -42,7 +42,7 @@
             </form>
         </div>
 
-        <span wire:loading wire:target="save" class="absolute inset-y-0 inset-x-3/4 place-content-center">
+        <span wire:loading wire:target="title, content" class="absolute inset-y-0 inset-x-3/4 place-content-center">
             <x-svg.arrow-spin class="size-5 animate-spin" />
         </span>
     </div>
@@ -51,11 +51,11 @@
         <!-- Note list -->
         <div class="grid sm:grid-cols-3 gap-4">
             @foreach ($notes as $note)
-                <x-card class="space-y-1">
+                <x-card>
                     <div class="flex items-center justify-between" x-data="{ showDelete: false }"
                         x-on:mouseenter="showDelete = true" x-on:mouseleave="showDelete = false">
                         <!-- Note created time -->
-                        <div class="flex items-center text-xs gap-x-2 opacity-50">
+                        <div class="flex items-center text-xs gap-x-2 opacity-50 pb-2">
                             <x-svg.clock class="size-3" />
                             {{ $note->updated_at->diffForHumans() }}
                         </div>
@@ -75,7 +75,7 @@
 
                         @isset($note->content)
                             <div class="{{ isset($note->title) ? 'text-sm opacity-75' : 'font-bold text-xl' }}">
-                                {{ $note->content }}
+                                @markdown($note->content)
                             </div>
                         @endisset
                     </div>
